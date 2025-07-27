@@ -13,13 +13,6 @@ export const getCurrentUser = createPublicQuery()({
     return {
       ...user.doc(),
       id: user._id,
-      credits: user.credits ?? 0,
-      monthlyCredits: user.monthlyCredits ?? 0,
-      isAdmin: user.isAdmin,
-      isPremium: user.isPremium,
-      isPremiumPlus: user.isPremiumPlus,
-      isSubscribed: user.isSubscribed,
-      isSuperAdmin: user.isSuperAdmin,
     };
   },
 });

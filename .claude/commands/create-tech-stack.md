@@ -332,7 +332,7 @@ Add discovered commands to the Commands section:
 
 ### Development
 
-- `pnpm dev` - Start Next.js dev server on port 3000
+- `pnpm dev` - Start Next.js dev server on port 3005
 - `pnpm build` - Build production bundle
 - `pnpm typecheck` - Run tsc --noEmit
 

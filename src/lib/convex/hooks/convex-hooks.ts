@@ -20,14 +20,15 @@ import {
   type PaginatedQueryArgs,
   type PaginatedQueryItem,
   type PaginatedQueryReference,
+  useConvexAuth,
   usePaginatedQuery,
   useQueries,
   useQuery,
 } from 'convex/react';
-import { useAuth } from 'node_modules/@convex-dev/better-auth/dist/esm/react/client';
 
-import { pushModal } from '@/components/modals';
-import { useAuthValue } from '@/components/providers/convex-provider';
+import { useAuthValue } from '@/lib/convex/components/convex-provider';
+import { useRouter } from 'next/navigation';
+import { routes } from '@/lib/navigation/routes';
 
 export const useIsAuth = () => {
   return useAuthValue('isAuthenticated');
@@ -49,11 +50,12 @@ export function useStableQuery<Query extends FunctionReference<'query'>>(
 
 export const useAuthGuard = () => {
   const isAuth = useIsAuth();
+  const router = useRouter();
 
   return useCallback(
     (callback?: () => Promise<void> | void) => {
       if (!isAuth) {
-        pushModal('Login');
+        router.push(routes.login());
 
         return true;
       }
@@ -102,7 +104,7 @@ export const usePublicQuery = <Query extends FunctionReference<'query'>>(
       status: 'pending';
     } => {
   // Some public queries have auth logic, so we need to skip when auth is loading
-  const auth = useAuth();
+  const auth = useConvexAuth();
   const mounted = useMounted();
   const adjustedArgs = auth.isLoading ? 'skip' : args;
 
@@ -135,7 +137,7 @@ export const usePublicQuery = <Query extends FunctionReference<'query'>>(
 
 // Query skipped for unauthenticated users
 export const useAuthQuery: typeof usePublicQuery = (query, args, options) => {
-  const { isLoading } = useAuth();
+  const { isLoading } = useConvexAuth();
   const isAuth = useIsAuth() && !isLoading;
 
   const result = usePublicQuery(
@@ -174,7 +176,7 @@ export const usePublicPaginatedQuery = <Query extends PaginatedQueryReference>(
   fetchNextPage: () => void;
 } => {
   // Some public queries have auth logic, so we need to skip when auth is loading
-  const auth = useAuth();
+  const auth = useConvexAuth();
   const mounted = useMounted();
   args = auth.isLoading ? 'skip' : args;
 
@@ -235,7 +237,7 @@ export const useAuthPaginatedQuery: typeof usePublicPaginatedQuery = (
   args,
   options
 ) => {
-  const { isLoading } = useAuth();
+  const { isLoading } = useConvexAuth();
   const isAuth = useIsAuth() && !isLoading;
 
   const result = usePublicPaginatedQuery(

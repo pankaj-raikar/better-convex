@@ -1,9 +1,8 @@
 import * as React from 'react';
 
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
-import { env } from '@/env';
-import { getSessionUser, isUnauth } from '@/lib/convex/server';
+import { isUnauth } from '@/lib/convex/server';
 import { routes } from '@/lib/navigation/routes';
 
 export const authGuard = async () => {
@@ -47,45 +46,6 @@ export async function AuthRedirect({
   searchParams?: Record<string, string>;
 }) {
   await authRedirect({ pathname, searchParams });
-
-  return <>{children}</>;
-}
-
-export const adminGuard = async () => {
-  // Get session from Convex
-  const user = await getSessionUser();
-
-  if (!user?.isAdmin) {
-    notFound();
-  }
-};
-
-export const superAdminGuard = async () => {
-  // Get session from Convex
-  const user = await getSessionUser();
-
-  if (!user?.isSuperAdmin) {
-    notFound();
-  }
-};
-
-export async function AdminGuard({
-  children,
-  pathname,
-  searchParams,
-}: {
-  children: React.ReactNode;
-  pathname?: string;
-  searchParams?: Record<string, string>;
-}) {
-  await authRedirect({ pathname, searchParams });
-
-  // Get session from Convex
-  const user = await getSessionUser();
-
-  if (env.NODE_ENV === 'production' && !user?.isSuperAdmin) {
-    return notFound();
-  }
 
   return <>{children}</>;
 }

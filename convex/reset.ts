@@ -45,7 +45,7 @@ export const resetAuth = createInternalMutation()({
 
         // Delete all documents using pagination
         while (hasMore) {
-          const result = await ctx.runMutation(
+          const result: any = await ctx.runMutation(
             components.betterAuth.lib.deleteMany,
             {
               model: tableName,

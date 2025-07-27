@@ -564,8 +564,8 @@ const tags = await message.edge('tags'); // Get all related tags
 // ⚠️ IMPORTANT: Use .has() for O(1) edge existence checks!
 // ❌ INEFFICIENT: Fetching all to check existence
 const following = await user.edge('following');
-const isFollowing = following.some(u => u._id === targetUserId); // O(n)
-// ✅ EFFICIENT: Direct existence check  
+const isFollowing = following.some((u) => u._id === targetUserId); // O(n)
+// ✅ EFFICIENT: Direct existence check
 const isFollowing = await user.edge('following').has(targetUserId); // O(1)
 
 // Write operations require re-fetch
@@ -585,13 +585,19 @@ const enriched = await ctx
 // ❌ WRONG: Using asyncMap for Ents query results
 import { asyncMap } from 'convex-helpers';
 const users = await ctx.table('users').take(10);
-const enriched = await asyncMap(users, async (user) => ({ ...user, profile: await user.edge('profile') }));
+const enriched = await asyncMap(users, async (user) => ({
+  ...user,
+  profile: await user.edge('profile'),
+}));
 
 // ✅ CORRECT: Use built-in .map() for Ents queries
-const enriched = await ctx.table('users').take(10).map(async (user) => ({
-  ...user.doc(),
-  profile: await user.edge('profile')
-}));
+const enriched = await ctx
+  .table('users')
+  .take(10)
+  .map(async (user) => ({
+    ...user.doc(),
+    profile: await user.edge('profile'),
+  }));
 
 // ✅ Use asyncMap ONLY for plain arrays or stream results
 const ids = ['id1', 'id2', 'id3'];
@@ -663,7 +669,7 @@ const idToUsername: Record<Id<'users'>, string> = {};
 
 // Auth-aware context (from convex/functions.ts), NEVER use ctx: any
 AuthQueryCtx, PublicQueryCtx, AuthMutationCtx, PublicMutationCtx;
-// SessionUser: EntWriter<'users'> + computed properties (isAdmin, isPremium, etc.)
+// SessionUser: EntWriter<'users'> + computed properties
 // In auth contexts: ctx.user (SessionUser), ctx.userId (Id<'users'>)
 
 // For client-side type patterns, see convex-client.mdc
@@ -1664,8 +1670,8 @@ const tags = await message.edge('tags'); // Get all related tags
 // ⚠️ IMPORTANT: Use .has() for O(1) edge existence checks!
 // ❌ INEFFICIENT: Fetching all to check existence
 const following = await user.edge('following');
-const isFollowing = following.some(u => u._id === targetUserId); // O(n)
-// ✅ EFFICIENT: Direct existence check  
+const isFollowing = following.some((u) => u._id === targetUserId); // O(n)
+// ✅ EFFICIENT: Direct existence check
 const isFollowing = await user.edge('following').has(targetUserId); // O(1)
 
 // Write operations require re-fetch
@@ -1685,13 +1691,19 @@ const enriched = await ctx
 // ❌ WRONG: Using asyncMap for Ents query results
 import { asyncMap } from 'convex-helpers';
 const users = await ctx.table('users').take(10);
-const enriched = await asyncMap(users, async (user) => ({ ...user, profile: await user.edge('profile') }));
+const enriched = await asyncMap(users, async (user) => ({
+  ...user,
+  profile: await user.edge('profile'),
+}));
 
 // ✅ CORRECT: Use built-in .map() for Ents queries
-const enriched = await ctx.table('users').take(10).map(async (user) => ({
-  ...user.doc(),
-  profile: await user.edge('profile')
-}));
+const enriched = await ctx
+  .table('users')
+  .take(10)
+  .map(async (user) => ({
+    ...user.doc(),
+    profile: await user.edge('profile'),
+  }));
 
 // ✅ Use asyncMap ONLY for plain arrays or stream results
 const ids = ['id1', 'id2', 'id3'];
@@ -1763,7 +1775,7 @@ const idToUsername: Record<Id<'users'>, string> = {};
 
 // Auth-aware context (from convex/functions.ts), NEVER use ctx: any
 AuthQueryCtx, PublicQueryCtx, AuthMutationCtx, PublicMutationCtx;
-// SessionUser: EntWriter<'users'> + computed properties (isAdmin, isPremium, etc.)
+// SessionUser: EntWriter<'users'> + computed properties
 // In auth contexts: ctx.user (SessionUser), ctx.userId (Id<'users'>)
 
 // For client-side type patterns, see convex-client.mdc

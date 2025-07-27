@@ -6,7 +6,7 @@
     "build": "next build",
     "predev": "convex dev --until-success --run init",
     "dev": "concurrently 'pnpm dev:app' 'pnpm dev:backend'",
-    "dev:app": "next dev --turbopack",
+    "dev:app": "next dev --turbopack --port 3005",
     "dev:backend": "convex dev",
     "dev:init": "tsx tooling/scripts/sync-convex-env.ts",
     "dev:sync": "tsx tooling/scripts/sync-convex-env.ts --force",
@@ -53,14 +53,20 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
+    "@t3-oss/env-nextjs": "^0.13.8",
+    "@tanstack/react-query": "^5.83.0",
+    "better-auth": "^1.3.4",
     "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "concurrently": "^9.2.0",
     "convex": "1.25.2",
     "convex-ents": "^0.15.0",
     "convex-helpers": "0.1.99",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
+    "jotai-x": "^2.3.3",
     "lucide-react": "^0.526.0",
     "next": "15.4.4",
     "next-themes": "^0.4.6",
@@ -72,9 +78,11 @@
     "react-resizable-panels": "^3.0.3",
     "recharts": "2.15.4",
     "sonner": "^2.0.6",
+    "tailwind-merge": "^3.3.1",
     "ts-essentials": "10.1.1",
+    "tsx": "^4.20.3",
     "vaul": "^1.1.2",
-    "zod": "^4.0.10"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -85,6 +93,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.6",
     "typescript": "^5"
   }
 }

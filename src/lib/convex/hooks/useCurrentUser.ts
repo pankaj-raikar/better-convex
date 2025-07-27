@@ -9,19 +9,8 @@ export const useCurrentUser = () => {
     {
       placeholderData: {
         id: '1' as any,
-        credits: 0,
-        email: 'user@example.com',
-        isAdmin: false,
-        isMonthlyPlan: false,
-        isPremium: false,
-        isPremiumPlus: false,
-        isSubscribed: false,
-        isSuperAdmin: false,
-        monthlyCredits: 0,
+        email: 'better-convex@gmail.com',
         name: undefined,
-        profileImageUrl: undefined,
-        totalCredits: 0,
-        username: 'user',
       },
     }
   );

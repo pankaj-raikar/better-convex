@@ -170,7 +170,7 @@ export function getUserTier(
 export async function rateLimitGuard(
   ctx: (ActionCtx | MutationCtx) & {
     rateLimitKey: string;
-    user: Pick<SessionUser, 'id' | 'isAdmin' | 'isPremium'> | null;
+    user: { id?: string; isAdmin?: boolean; isPremium?: boolean } | null;
   }
 ) {
   const tier = getUserTier(ctx.user);

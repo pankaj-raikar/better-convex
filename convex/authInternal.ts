@@ -1,5 +1,5 @@
-import { getSessionUser } from '@convex/auth';
-import { createInternalQuery } from '@convex/functions';
+import { getSessionUser } from './auth';
+import { createInternalQuery } from './functions';
 
 export const sessionUser = createInternalQuery()({
   args: {},

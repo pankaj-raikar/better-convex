@@ -14,7 +14,7 @@ export type RouteSchemas = {
 
 export const routes = {
   faq: defineRoute('/faq'),
-  home: defineRoute<RouteSchemas['home']>('/'),
+  home: defineRoute('/'),
   login: defineRoute('/login'),
   loginProvider: defineRoute<RouteSchemas['loginProvider']>(
     '/api/auth/[provider]/login'

@@ -19,15 +19,8 @@ import {
   type QueryCtx,
   query,
 } from './_generated/server';
-import {
-  getAuthUserId,
-} from './functions';
-import { getEnv } from './helpers/getEnv';
+import { getAuthUserId } from './functions';
 import { entDefinitions } from './schema';
-import {
-  generateFromUsername,
-  generateUsername,
-} from './user/generateFromUsername';
 import { mapSessionToUser } from './user/mapSessionToUser';
 
 const authFunctions: AuthFunctions = internal.auth;
@@ -61,20 +54,6 @@ export const createAuth = (ctx: GenericCtx) => {
         clientId: process.env.GITHUB_CLIENT_ID!,
         clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         mapProfileToUser: async (profile) => {
-          // Store the profile data temporarily so we can access it in onCreateUser
-          // const profileData = {
-          //   bio: profile.bio || undefined,
-          //   firstName: profile.name?.split(' ')[0] || undefined,
-          //   github: profile.login,
-          //   lastName: profile.name?.split(' ').slice(1).join(' ') || undefined,
-          //   location: profile.location || undefined,
-          //   x: profile.twitter_username || undefined,
-          // };
-
-          // // Store in a temporary map keyed by email
-          // githubProfileCache.set(profile.email, profileData);
-
-          // Only return the fields that better-auth expects
           return {
             email: profile.email,
             image: profile.avatar_url,
@@ -86,15 +65,6 @@ export const createAuth = (ctx: GenericCtx) => {
         clientId: process.env.GOOGLE_CLIENT_ID!,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         mapProfileToUser: async (profile) => {
-          // Store the profile data temporarily
-          // const profileData = {
-          //   firstName: profile.given_name || undefined,
-          //   lastName: profile.family_name || undefined,
-          // };
-
-          // googleProfileCache.set(profile.email, profileData);
-
-          // Only return the fields that better-auth expects
           return {
             email: profile.email,
             image: profile.picture,
@@ -132,98 +102,16 @@ export const {
     }
 
     // Check if user is a superadmin
-    const isSuperAdmin = getEnv().SUPERADMIN.includes(user.email);
-
-    // Generate unique username
-    let username = generateFromUsername(user.name || generateUsername());
-    let usernameIdSize = 3;
-    let retry = 10;
-
-    // Check for existing username and generate a unique one
-    while (retry > 0) {
-      const existingUser = await table('users').get('username', username);
-
-      if (!existingUser) {
-        break;
-      }
-
-      retry -= 1;
-      usernameIdSize += 1;
-      username = generateFromUsername(
-        user.name || generateUsername(),
-        usernameIdSize
-      );
-    }
+    // const isSuperAdmin = getEnv().SUPERADMIN.includes(user.email);
 
     // Create user in application users table
     const userId = await table('users').insert({
       // bio: profileData.bio || undefined,
-      credits: 0,
-      deletedAt: undefined,
       email: user.email,
       emailVerified: user.emailVerified || false,
-      // firstName: profileData.firstName || user.name?.split(' ')[0] || undefined,
-      // github: profileData.github || undefined,
       image: user.image || undefined,
-      // lastName:
-      //   profileData.lastName ||
-      //   user.name?.split(' ').slice(1).join(' ') ||
-      //   undefined,
-      // linkedin: profileData.linkedin || undefined,
-      // location: profileData.location || undefined,
-      monthlyCredits: 0,
-      monthlyCreditsPeriodCount: 0,
-      monthlyCreditsPeriodStart: undefined,
       name: user.name || undefined,
-      profileImageUrl: user.image || undefined,
-      role: isSuperAdmin ? 'SUPERADMIN' : 'USER',
-      stripeCancelAtPeriodEnd: undefined,
-      stripeCurrentPeriodEnd: undefined,
-      stripeCurrentPeriodStart: undefined,
-      stripeCustomerId: undefined,
-      stripePriceId: undefined,
-      stripeSubscriptionId: undefined,
-      stripeSubscriptionStatus: undefined,
-      username,
-      usernameUpdatedAt: undefined,
-      // website: profileData.website || undefined,
-      // x: profileData.x || undefined,
     });
-
-    // Automatically create a character for the new user
-    try {
-      const characterName = user.name || username;
-      const characterId = await ctx.db.insert('characters', {
-        private: false, // Public by default
-        userId: userId,
-
-        // Basic info
-        image: user.image || undefined,
-        name: characterName,
-
-        // Arrays & metadata
-        categories: [],
-
-        // Hide flags
-        awardsHide: false,
-        certificatesHide: false,
-        educationHide: false,
-        interestsHide: false,
-        languagesHide: false,
-        projectsHide: false,
-        publicationsHide: false,
-        referencesHide: false,
-        skillsHide: false,
-        volunteerHide: false,
-        workHide: false,
-      });
-
-      // Set as main character
-      await ctx.db.patch(userId, { mainCharacterId: characterId });
-    } catch (error) {
-      // Don't fail user creation if character creation fails
-      console.error('Failed to create character for new user:', error);
-    }
 
     return userId;
   },
@@ -243,12 +131,9 @@ export const {
     // Update additional fields if provided
     if (user.name !== undefined) {
       updates.name = user.name;
-      updates.firstName = user.name.split(' ')[0] || undefined;
-      updates.lastName = user.name.split(' ').slice(1).join(' ') || undefined;
     }
     if (user.image !== undefined) {
       updates.image = user.image;
-      updates.profileImageUrl = user.image;
     }
     if (user.emailVerified !== undefined) {
       updates.emailVerified = user.emailVerified;
@@ -284,17 +169,7 @@ export const getSessionUser = async (ctx: QueryCtx) => {
     return null;
   }
 
-  // Get dev settings if in development
-  let devSettings: any = null;
-
-  if (getEnv().NEXT_PUBLIC_ENVIRONMENT === 'development') {
-    devSettings = await table('devSettings').get(
-      'userId',
-      userId as Id<'users'>
-    );
-  }
-
-  return mapSessionToUser(user, devSettings);
+  return mapSessionToUser(user);
 };
 
 export const getSessionUserWriter = async (ctx: MutationCtx) => {
@@ -311,18 +186,8 @@ export const getSessionUserWriter = async (ctx: MutationCtx) => {
     return null;
   }
 
-  // Get dev settings if in development
-  let devSettings: any = null;
-
-  if (getEnv().NEXT_PUBLIC_ENVIRONMENT === 'development') {
-    devSettings = await table('devSettings').get(
-      'userId',
-      userId as Id<'users'>
-    );
-  }
-
   return {
-    ...mapSessionToUser(user, devSettings),
+    ...mapSessionToUser(user),
     delete: user.delete,
     doc: user.doc,
     edge: user.edge,

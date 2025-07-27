@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-imports */
-import type { SessionUser } from '@convex/user/mapSessionToUser';
+import type { SessionUser } from './user/mapSessionToUser';
 
 import { entsTableFactory } from 'convex-ents';
 import {
