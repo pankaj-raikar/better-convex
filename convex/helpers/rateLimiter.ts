@@ -84,6 +84,16 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
   'tag/update:free': { kind: 'fixed window', period: MINUTE, rate: 20 },
   'tag/update:premium': { kind: 'fixed window', period: MINUTE, rate: 60 },
 
+  // Todo limits
+  'todo/create:free': { kind: 'fixed window', period: MINUTE, rate: 20 },
+  'todo/create:premium': { kind: 'fixed window', period: MINUTE, rate: 60 },
+
+  'todo/update:free': { kind: 'fixed window', period: MINUTE, rate: 30 },
+  'todo/update:premium': { kind: 'fixed window', period: MINUTE, rate: 100 },
+
+  'todo/delete:free': { kind: 'fixed window', period: MINUTE, rate: 20 },
+  'todo/delete:premium': { kind: 'fixed window', period: MINUTE, rate: 60 },
+
   // Export limits
   'export/character:free': {
     kind: 'fixed window',

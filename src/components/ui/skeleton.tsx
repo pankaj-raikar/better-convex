@@ -1,26 +1,38 @@
-import { cn } from "@/lib/utils"
-import { ReactElement, ReactNode } from "react"
+import React from "react";
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+import { useMounted } from "@/hooks/use-mounted";
+import { cn } from "@/lib/utils";
+
+export function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="skeleton"
-      className={cn("bg-accent animate-pulse rounded-md", className)}
+      className={cn("animate-pulse rounded-md bg-muted", className)}
       {...props}
     />
-  )
+  );
 }
 
-interface WithSkeletonProps {
-  children: ReactNode
-  isLoading: boolean
-}
+export function WithSkeleton({
+  children,
+  className,
+  isLoading,
+  ...props
+}: React.ComponentProps<"div"> & {
+  isLoading?: boolean;
+}) {
+  const mounted = useMounted();
 
-function WithSkeleton({ children, isLoading }: WithSkeletonProps): ReactElement {
-  if (isLoading) {
-    return <>{children}</>
-  }
-  return <>{children}</>
-}
+  return (
+    <div className={cn("relative w-fit", className)} {...props}>
+      {children}
 
-export { Skeleton, WithSkeleton }
+      {(!mounted || isLoading) && (
+        <>
+          <div className={cn("absolute inset-0 bg-background", className)} />
+
+          <Skeleton className={cn("absolute inset-0", className)} />
+        </>
+      )}
+    </div>
+  );
+}

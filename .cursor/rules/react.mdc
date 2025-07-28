@@ -27,6 +27,7 @@ alwaysApply: false
 - Use CSS variables from globals.css for consistent theming
 - Use Tailwind v4: [tailwind-v4.mdc](mdc:.cursor/rules/tailwind-v4.mdc)
 
-## Available UI Components
+## UI Components
 
 - All shadcn components are available in `src/components/ui`.
+- `Button`, `DropdownMenuItem`: DO NOT add `mr-2` to icons, we already use `gap-2`
