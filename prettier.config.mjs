@@ -1,10 +1,6 @@
 const config = {
   endOfLine: 'lf',
-  plugins: [
-    'prettier-plugin-packagejson',
-    'prettier-plugin-jsdoc',
-    'prettier-plugin-tailwindcss',
-  ],
+  plugins: ['prettier-plugin-packagejson', 'prettier-plugin-tailwindcss'],
   semi: true,
   singleQuote: true,
   tabWidth: 2,
