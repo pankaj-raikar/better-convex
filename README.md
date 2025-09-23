@@ -17,7 +17,7 @@ A modern Next.js starter template featuring **Convex** backend with **Better Aut
 
 - **Framework**: Next.js 15.5 with App Router & React 19
 - **Backend**: Convex with Ents (entity relationships)
-- **Authentication**: Better Auth with Convex adapter & organization plugin
+- **Authentication**: Better Auth with better-auth-convex package & organization plugin
 - **Payments**: Polar integration (subscriptions & credits)
 - **Styling**: Tailwind CSS v4 with CSS-first configuration
 - **State**: Jotai-x for client state, React Query for server state
@@ -217,7 +217,8 @@ const schema = defineEntSchema({
 ### Better Auth Schema
 
 ```typescript
-// convex/betterAuth/generatedSchema.ts - Auto-generated auth tables
+// convex/authSchema.ts - Auto-generated auth tables
+// Generated via: cd convex && npx @better-auth/cli generate -y --output authSchema.ts
 // Includes: user, session, account, organization, member, invitation
 ```
 
@@ -483,5 +484,4 @@ This will give you a clean authentication-only starter with:
 ## Resources
 
 - [Convex Documentation](https://docs.convex.dev)
-- [Convex Better Auth Documentation](https://convex-better-auth.netlify.app/)
-- [Better Auth Documentation](https://better-auth.com)
+- [Better Auth Convex Package](https://github.com/udecode/better-auth-convex) - Local installation without component boundaries
