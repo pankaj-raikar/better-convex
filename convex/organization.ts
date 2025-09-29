@@ -656,17 +656,9 @@ export const listMembers = createAuthQuery()({
     ),
   }),
   handler: async (ctx, args) => {
-    console.time('getAuth');
     const auth = getAuth(ctx);
-    console.timeEnd('getAuth');
-
-    console.time('getHeaders');
     const headers = await getHeaders(ctx);
-    console.timeEnd('getHeaders');
-
-    console.time('betterAuth.findOne organization');
     const org = await ctx.table('organization').get('slug', args.slug);
-    console.timeEnd('betterAuth.findOne organization');
 
     if (!org) {
       return {
@@ -682,7 +674,6 @@ export const listMembers = createAuthQuery()({
       });
     }
 
-    console.time('auth.api.listMembers');
     const response = await auth.api.listMembers({
       headers,
       query: {
@@ -690,7 +681,6 @@ export const listMembers = createAuthQuery()({
         organizationId: org._id,
       },
     });
-    console.timeEnd('auth.api.listMembers');
 
     if (!response || !response.members) {
       return {

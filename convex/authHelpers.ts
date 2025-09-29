@@ -26,9 +26,7 @@ const getSessionData = async (ctx: CtxWithTable<MutationCtx>) => {
     return null;
   }
 
-  console.time('getSession');
   const sessionResult = await getSession(ctx);
-  console.timeEnd('getSession');
 
   if (!sessionResult) {
     return null;
@@ -37,7 +35,6 @@ const getSessionData = async (ctx: CtxWithTable<MutationCtx>) => {
   const activeOrganizationId =
     sessionResult.activeOrganizationId as Id<'organization'> | null;
 
-  console.time('table.users.get');
   const [user, subscription] = await Promise.all([
     ctx.table('user').get(userId),
     (async () => {
@@ -62,8 +59,6 @@ const getSessionData = async (ctx: CtxWithTable<MutationCtx>) => {
       };
     })(),
   ]);
-
-  console.timeEnd('table.users.get');
 
   if (!user) {
     return null;
