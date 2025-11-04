@@ -1,9 +1,9 @@
 import { internal } from '@convex/_generated/api';
 import type { Doc, Id } from '@convex/_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '@convex/_generated/server';
-import type { AuthCtx } from '@convex/functions';
+import type { AuthCtx, CtxWithTable } from '@convex/functions';
 import { getProduct, productToPlan } from '@convex/polar/product';
-import type { CtxWithTable, Ent, EntWriter } from '@convex/shared/types';
+import type { Ent, EntWriter } from '@convex/shared/types';
 import { getSession } from 'better-auth-convex';
 import { ConvexError } from 'convex/values';
 

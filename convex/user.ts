@@ -1,7 +1,6 @@
 import { zid } from 'convex-helpers/server/zod';
 import { z } from 'zod';
 import { createAuthMutation, createPublicQuery } from './functions';
-import { updateSettingsSchema } from './userShared';
 
 // Check if user is authenticated
 export const getIsAuthenticated = createPublicQuery({
@@ -95,7 +94,10 @@ export const getCurrentUser = createPublicQuery()({
 
 // Update user settings
 export const updateSettings = createAuthMutation()({
-  args: updateSettingsSchema,
+  args: {
+    bio: z.string().optional(),
+    name: z.string().optional(),
+  },
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
     const { user } = ctx;

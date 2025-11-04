@@ -1,4 +1,5 @@
 import { getAuth } from '@convex/auth';
+import { registerTriggers } from '@convex/triggers';
 import { getHeaders } from 'better-auth-convex';
 import { type Auth, paginationOptsValidator } from 'convex/server';
 import { ConvexError } from 'convex/values';
@@ -33,7 +34,9 @@ import { rateLimitGuard } from './helpers/rateLimiter';
 import { roleGuard } from './helpers/roleGuard';
 import { entDefinitions } from './schema';
 import type { Ent, EntWriter } from './shared/types';
-import { triggers } from './triggers';
+
+// Initialize triggers
+const triggers = registerTriggers();
 
 export type CtxWithTable<Ctx extends MutationCtx | QueryCtx = QueryCtx> =
   ReturnType<typeof getCtxWithTable<Ctx>>;
@@ -84,10 +87,14 @@ function checkDevOnly(devOnly?: boolean) {
 
 export const getCtxWithTable = <Ctx extends MutationCtx | QueryCtx>(
   ctx: Ctx
-) => ({
-  ...ctx,
-  table: entsTableFactory(ctx, entDefinitions),
-});
+) => {
+  // Use the db from ctx (which may already be wrapped by triggers)
+  // entsTableFactory will use ctx.db internally, preserving trigger wrapping
+  return {
+    ...ctx,
+    table: entsTableFactory(ctx, entDefinitions),
+  };
+};
 
 type AuthError = {
   code: string;
@@ -154,9 +161,7 @@ async function applyRateLimit(
   rateLimit: string | null | undefined,
   user: Pick<SessionUser, 'id' | 'plan'> | null
 ) {
-  if (!rateLimit) {
-    return;
-  }
+  if (!rateLimit) return;
 
   await rateLimitGuard({
     ...ctx,
