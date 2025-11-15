@@ -20,10 +20,11 @@ const envSchema = z.object({
   POLAR_PRODUCT_PREMIUM: z.string().optional(),
   POLAR_WEBHOOK_SECRET: z.string().optional(),
 
-  // Superadmin emails
+  // Superadmin emails - optional comma-separated list
   ADMIN: z
     .string()
-    .transform((s) => (s ? s.split(',') : []))
+    .optional()
+    .transform((s) => (s ? s.split(',').map(email => email.trim()) : []))
     .pipe(z.array(z.string())),
 });
 

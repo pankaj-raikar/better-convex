@@ -1,16 +1,19 @@
-import type { AuthCtx } from '@convex/functions';
 import { entsTableFactory } from 'convex-ents';
 import { asyncMap } from 'convex-helpers';
 import type { Id } from './_generated/dataModel';
-import type { MutationCtx } from './_generated/server';
-
+import type { MutationCtx, QueryCtx } from './_generated/server';
 import { entDefinitions } from './schema';
+
+type AuthCtx = QueryCtx & {
+  table: any; // You might want to properly type this based on your auth implementation
+  auth: any; // You might want to properly type this based on your auth implementation
+};
 
 export const listUserOrganizations = async (
   ctx: AuthCtx,
   userId: Id<'user'>
 ) => {
-  const memberships = await ctx.table('member', 'userId', (q) =>
+  const memberships = await ctx.table('member', 'userId', (q: any) =>
     q.eq('userId', userId)
   );
 
@@ -18,14 +21,14 @@ export const listUserOrganizations = async (
     return [];
   }
 
-  return asyncMap(memberships, async (membership) => {
-    const org = await membership.edgeX('organization');
+  return asyncMap(memberships, async (membership: any) => {
+    const org = await (membership as any).edgeX('organization');
 
     return {
       ...org.doc(),
-      _creationTime: org._creationTime,
-      _id: org._id,
-      role: membership.role || 'member',
+      _creationTime: (org as any)._creationTime,
+      _id: (org as any)._id,
+      role: (membership as any).role || 'member',
     };
   });
 };

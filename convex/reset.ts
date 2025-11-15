@@ -1,15 +1,13 @@
-import type { TableNames } from '@convex/_generated/dataModel';
-
-import { getEnv } from '@convex/helpers/getEnv';
-import schema from '@convex/schema';
 import { z } from 'zod';
-
 import { internal } from './_generated/api';
+import type { TableNames } from './_generated/dataModel';
 import {
   createInternalAction,
   createInternalMutation,
   createInternalQuery,
 } from './functions';
+import { getEnv } from './helpers/getEnv';
+import schema from './schema';
 
 // import { deletePolarCustomers } from './polar/customer';
 

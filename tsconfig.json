@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@convex/*": ["./convex/*"]
+    },
     "strict": false,
     "strictNullChecks": true,
     "allowUnusedLabels": false,
@@ -37,12 +42,7 @@
       {
         "name": "next"
       }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@convex/*": ["./convex/*"]
-    }
+    ]
   },
   "include": [
     "next-env.d.ts",

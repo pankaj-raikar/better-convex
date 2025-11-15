@@ -1,6 +1,6 @@
-import { createUser } from '@convex/authHelpers';
 import { z } from 'zod';
 import { internal } from './_generated/api';
+import { createUser } from './authHelpers';
 import { createInternalMutation } from './functions';
 import { getEnv } from './helpers/getEnv';
 

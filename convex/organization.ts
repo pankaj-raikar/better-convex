@@ -1,17 +1,15 @@
-import type { Id } from '@convex/_generated/dataModel';
-
-import { hasPermission } from '@convex/authHelpers';
-import { listUserOrganizations } from '@convex/organizationHelpers';
 import { ConvexError } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 import { zid } from 'convex-helpers/server/zod';
 import { z } from 'zod';
-
+import type { Id } from './_generated/dataModel';
+import { hasPermission } from './authHelpers';
 import {
   type AuthMutationCtx,
   createAuthMutation,
   createAuthQuery,
 } from './functions';
+import { listUserOrganizations } from './organizationHelpers';
 
 // Maximum members per organization (including pending invitations)
 const MEMBER_LIMIT = 5;

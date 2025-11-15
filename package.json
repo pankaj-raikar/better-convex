@@ -7,7 +7,7 @@
     "check": "concurrently 'pnpm lint' 'eslint' 'pnpm typecheck'",
     "predev": "convex dev --until-success --run init",
     "dev": "concurrently 'pnpm dev:app' 'pnpm dev:backend'",
-    "dev:app": "next dev --turbopack --port 3005",
+    "dev:app": "next dev --turbopack --port 3000",
     "dev:backend": "convex dev",
     "gen": "cd convex && npx @better-auth/cli generate -y --output authSchema.ts",
     "lint": "npx ultracite@latest check",

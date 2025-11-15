@@ -1,5 +1,3 @@
-import { getAuth } from '@convex/auth';
-import { registerTriggers } from '@convex/triggers';
 import { getHeaders } from 'better-auth-convex';
 import { type Auth, paginationOptsValidator } from 'convex/server';
 import { ConvexError } from 'convex/values';
@@ -24,6 +22,7 @@ import {
   internalQuery,
   query,
 } from './_generated/server';
+import { getAuth } from './auth';
 import {
   getSessionUser,
   getSessionUserWriter,
@@ -34,6 +33,7 @@ import { rateLimitGuard } from './helpers/rateLimiter';
 import { roleGuard } from './helpers/roleGuard';
 import { entDefinitions } from './schema';
 import type { Ent, EntWriter } from './shared/types';
+import { registerTriggers } from './triggers';
 
 // Initialize triggers
 const triggers = registerTriggers();
@@ -308,14 +308,14 @@ export const createAuthAction = ({
   devOnly?: boolean;
   rateLimit?: string | null;
   role?: 'admin';
-} = {}) =>
+} = {}): ReturnType<typeof zCustomAction> =>
   zCustomAction(
     action,
-    customCtx(async (ctx) => {
+    customCtx(async (ctx: any): Promise<any> => {
       checkDevOnly(devOnly);
 
-      const rawUser = await ctx.runQuery(api.user.getSessionUser, {});
-      const user = requireUser(rawUser as SessionUser | null);
+      const rawUser: any = await ctx.runQuery(api.user.getSessionUser, {});
+      const user: any = requireUser(rawUser);
 
       if (role) {
         roleGuard(role, user);

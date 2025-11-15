@@ -1,5 +1,3 @@
-import type { DataModel } from '@convex/_generated/dataModel';
-import { ac, roles } from '@convex/authPermissions';
 import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { admin, organization } from 'better-auth/plugins';
@@ -10,12 +8,14 @@ import {
 } from 'better-auth-convex';
 import { entsTableFactory } from 'convex-ents';
 import { api, internal } from './_generated/api';
+import type { DataModel } from './_generated/dataModel';
 import type {
   ActionCtx,
   GenericCtx,
   MutationCtx,
   QueryCtx,
 } from './_generated/server';
+import { ac, roles } from './authPermissions';
 import { internalMutation } from './functions';
 import { getEnv } from './helpers/getEnv';
 import { createPersonalOrganization } from './organizationHelpers';

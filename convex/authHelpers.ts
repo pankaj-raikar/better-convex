@@ -1,11 +1,11 @@
-import { internal } from '@convex/_generated/api';
-import type { Doc, Id } from '@convex/_generated/dataModel';
-import type { MutationCtx, QueryCtx } from '@convex/_generated/server';
-import type { AuthCtx, CtxWithTable } from '@convex/functions';
-import { getProduct, productToPlan } from '@convex/polar/product';
-import type { Ent, EntWriter } from '@convex/shared/types';
 import { getSession } from 'better-auth-convex';
 import { ConvexError } from 'convex/values';
+import { internal } from './_generated/api';
+import type { Doc, Id } from './_generated/dataModel';
+import type { MutationCtx, QueryCtx } from './_generated/server';
+import type { AuthCtx, CtxWithTable } from './functions';
+import { getProduct, productToPlan } from './polar/product';
+import type { Ent, EntWriter } from './shared/types';
 
 export type SessionUser = Omit<Doc<'user'>, '_creationTime' | '_id'> & {
   id: Id<'user'>;
