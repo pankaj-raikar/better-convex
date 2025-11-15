@@ -85,13 +85,16 @@ else
   FORMATTED_OUTPUT=""
 fi
 
+# Escape output for JSON
+FORMATTED_ESCAPED=$(echo "$FORMATTED_OUTPUT" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | awk '{printf "%s\\n", $0}')
+
 # Only output JSON if FORMATTED_OUTPUT is non-empty
 if [ -n "$FORMATTED_OUTPUT" ]; then
   cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "UserPromptSubmit",
-    "additionalContext": "$FORMATTED_OUTPUT"
+    "additionalContext": "$FORMATTED_ESCAPED"
   }
 }
 EOF

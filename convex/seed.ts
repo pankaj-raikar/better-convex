@@ -131,7 +131,7 @@ export const generateSamples = createAuthAction()({
     created: z.number(),
     todosCreated: z.number(),
   }),
-  handler: async (ctx: any, args: { count: number }) => {
+  handler: async (ctx, args) => {
     let totalCreated = 0;
     let totalTodosCreated = 0;
 
