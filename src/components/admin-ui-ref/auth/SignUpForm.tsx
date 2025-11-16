@@ -1,10 +1,10 @@
-"use client";
-import Link from "next/link";
-import { useState } from "react";
-import Checkbox from "@/components/admin-ui-ref/form/input/Checkbox";
-import Input from "@/components/admin-ui-ref/form/input/InputField";
-import Label from "@/components/admin-ui-ref/form/Label";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import Checkbox from '@/components/admin-ui-ref/form/input/Checkbox';
+import Input from '@/components/admin-ui-ref/form/input/InputField';
+import Label from '@/components/admin-ui-ref/form/Label';
+import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -141,16 +141,16 @@ export default function SignUpForm() {
                   <div className="relative">
                     <Input
                       placeholder="Enter your password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                     />
                     <button
                       aria-label={
-                        showPassword ? "Hide password" : "Show password"
+                        showPassword ? 'Hide password' : 'Show password'
                       }
                       className="-translate-y-1/2 absolute top-1/2 right-4 z-30 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={() => setShowPassword(!showPassword)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
                           setShowPassword(!showPassword);
                         }
@@ -173,11 +173,11 @@ export default function SignUpForm() {
                     onChange={setIsChecked}
                   />
                   <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
-                    By creating an account means you agree to the{" "}
+                    By creating an account means you agree to the{' '}
                     <span className="text-gray-800 dark:text-white/90">
                       Terms and Conditions,
-                    </span>{" "}
-                    and our{" "}
+                    </span>{' '}
+                    and our{' '}
                     <span className="text-gray-800 dark:text-white">
                       Privacy Policy
                     </span>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { api } from "@convex/_generated/api";
-import type { Id } from "@convex/_generated/dataModel";
+import { api } from '@convex/_generated/api';
+import type { Id } from '@convex/_generated/dataModel';
 import {
   Clock,
   Crown,
@@ -11,19 +11,19 @@ import {
   UserMinus,
   UserPlus,
   X,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -31,24 +31,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { WithSkeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/select';
+import { WithSkeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -56,26 +56,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { useAuthMutation, useAuthQuery } from "@/lib/convex/hooks";
+} from '@/components/ui/table';
+import { useAuthMutation, useAuthQuery } from '@/lib/convex/hooks';
 
 type Member = {
-  id: Id<"member">;
+  id: Id<'member'>;
   createdAt: number;
-  organizationId: Id<"organization">;
+  organizationId: Id<'organization'>;
   role?: string;
   user: {
-    id: Id<"user">;
+    id: Id<'user'>;
     email: string;
     image?: string | null;
     name?: string | null;
   };
-  userId: Id<"user">;
+  userId: Id<'user'>;
 };
 
 type OrganizationMembersProps = {
   organization?: {
-    id: Id<"organization">;
+    id: Id<'organization'>;
     isPersonal: boolean;
     role?: string;
     slug: string;
@@ -95,8 +95,8 @@ export function OrganizationMembers({
 }: OrganizationMembersProps) {
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [inviteData, setInviteData] = useState({
-    email: "",
-    role: "member",
+    email: '',
+    role: 'member',
   });
 
   const _a = api;
@@ -104,18 +104,18 @@ export function OrganizationMembers({
   const { data: pendingInvitations, isLoading: invitationsLoading } =
     useAuthQuery(
       api.organization.listPendingInvitations,
-      organization ? { slug: organization.slug } : "skip",
+      organization ? { slug: organization.slug } : 'skip',
       {
         placeholderData: [
           {
-            id: "1" as any,
-            createdAt: new Date("2025-11-04").getTime(),
-            email: "pending@example.com",
+            id: '1' as any,
+            createdAt: new Date('2025-11-04').getTime(),
+            email: 'pending@example.com',
             expiresAt:
-              new Date("2025-11-04").getTime() + 7 * 24 * 60 * 60 * 1000,
-            organizationId: "1" as any,
-            role: "member",
-            status: "pending",
+              new Date('2025-11-04').getTime() + 7 * 24 * 60 * 60 * 1000,
+            organizationId: '1' as any,
+            role: 'member',
+            status: 'pending',
           },
         ],
       }
@@ -124,38 +124,38 @@ export function OrganizationMembers({
   const inviteMember = useAuthMutation(api.organization.inviteMember, {
     onSuccess: () => {
       setShowInviteDialog(false);
-      setInviteData({ email: "", role: "member" });
-      toast.success("Invitation sent successfully");
+      setInviteData({ email: '', role: 'member' });
+      toast.success('Invitation sent successfully');
     },
     onError: (error: any) => {
-      toast.error(error.data?.message ?? "Failed to send invitation");
+      toast.error(error.data?.message ?? 'Failed to send invitation');
     },
   });
 
   const removeMember = useAuthMutation(api.organization.removeMember, {
     onSuccess: () => {
-      toast.success("Member removed successfully");
+      toast.success('Member removed successfully');
     },
     onError: (error: any) => {
-      toast.error(error.data?.message ?? "Failed to remove member");
+      toast.error(error.data?.message ?? 'Failed to remove member');
     },
   });
 
   const updateMemberRole = useAuthMutation(api.organization.updateMemberRole, {
     onSuccess: () => {
-      toast.success("Member role updated successfully");
+      toast.success('Member role updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.data?.message ?? "Failed to update member role");
+      toast.error(error.data?.message ?? 'Failed to update member role');
     },
   });
 
   const cancelInvitation = useAuthMutation(api.organization.cancelInvitation, {
     onSuccess: () => {
-      toast.success("Invitation cancelled successfully");
+      toast.success('Invitation cancelled successfully');
     },
     onError: (error: any) => {
-      toast.error(error.data?.message ?? "Failed to cancel invitation");
+      toast.error(error.data?.message ?? 'Failed to cancel invitation');
     },
   });
 
@@ -165,13 +165,13 @@ export function OrganizationMembers({
 
   const handleInviteMember = async () => {
     if (!inviteData.email.trim()) {
-      toast.error("Email is required");
+      toast.error('Email is required');
       return;
     }
 
     inviteMember.mutate({
       email: inviteData.email.trim(),
-      role: inviteData.role as "owner" | "member",
+      role: inviteData.role as 'owner' | 'member',
     });
   };
 
@@ -179,20 +179,20 @@ export function OrganizationMembers({
     removeMember.mutate({ memberId: member.id });
   };
 
-  const handleUpdateRole = (member: Member, role: "owner" | "member") => {
+  const handleUpdateRole = (member: Member, role: 'owner' | 'member') => {
     updateMemberRole.mutate({ memberId: member.id, role });
   };
 
-  const handleCancelInvitation = (invitationId: Id<"invitation">) => {
+  const handleCancelInvitation = (invitationId: Id<'invitation'>) => {
     cancelInvitation.mutate({ invitationId });
   };
 
-  const isOwner = organization.role === "owner";
+  const isOwner = organization.role === 'owner';
   const canInvite = isOwner && !organization.isPersonal;
 
   const getRoleIcon = (role?: string) => {
     switch (role) {
-      case "owner":
+      case 'owner':
         return <Crown className="h-4 w-4 text-yellow-600" />;
       default:
         return <User className="h-4 w-4 text-muted-foreground" />;
@@ -201,7 +201,7 @@ export function OrganizationMembers({
 
   const getRoleBadge = (role?: string) => {
     switch (role) {
-      case "owner":
+      case 'owner':
         return <Badge variant="default">Owner</Badge>;
       default:
         return <Badge variant="secondary">Member</Badge>;
@@ -256,7 +256,7 @@ export function OrganizationMembers({
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={member.user.image || ""} />
+                          <AvatarImage src={member.user.image || ''} />
                           <AvatarFallback>
                             {member.user.name?.charAt(0) ||
                               member.user.email.charAt(0).toUpperCase()}
@@ -264,7 +264,7 @@ export function OrganizationMembers({
                         </Avatar>
                         <div>
                           <p className="font-medium">
-                            {member.user.name || "Unknown User"}
+                            {member.user.name || 'Unknown User'}
                           </p>
                           <p className="text-muted-foreground text-sm">
                             {member.user.email}
@@ -283,7 +283,7 @@ export function OrganizationMembers({
                     </TableCell>
                     {isOwner && (
                       <TableCell>
-                        {member.role !== "owner" && (
+                        {member.role !== 'owner' && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button size="sm" variant="ghost">
@@ -293,7 +293,7 @@ export function OrganizationMembers({
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() =>
-                                  handleUpdateRole(member, "owner")
+                                  handleUpdateRole(member, 'owner')
                                 }
                               >
                                 <Crown className="h-4 w-4" />
@@ -301,7 +301,7 @@ export function OrganizationMembers({
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() =>
-                                  handleUpdateRole(member, "member")
+                                  handleUpdateRole(member, 'member')
                                 }
                               >
                                 <User className="h-4 w-4" />

@@ -1,8 +1,8 @@
-import Link from "next/link";
-import type React from "react";
+import Link from 'next/link';
+import type React from 'react';
 
 type DropdownItemProps = {
-  tag?: "a" | "button";
+  tag?: 'a' | 'button';
   href?: string;
   onClick?: () => void;
   onItemClick?: () => void;
@@ -12,18 +12,18 @@ type DropdownItemProps = {
 };
 
 export const DropdownItem: React.FC<DropdownItemProps> = ({
-  tag = "button",
+  tag = 'button',
   href,
   onClick,
   onItemClick,
-  baseClassName = "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-  className = "",
+  baseClassName = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900',
+  className = '',
   children,
 }) => {
   const combinedClasses = `${baseClassName} ${className}`.trim();
 
   const handleClick = (event: React.MouseEvent) => {
-    if (tag === "button") {
+    if (tag === 'button') {
       event.preventDefault();
     }
     if (onClick) {
@@ -34,7 +34,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
     }
   };
 
-  if (tag === "a" && href) {
+  if (tag === 'a' && href) {
     return (
       <Link
         className={combinedClasses}

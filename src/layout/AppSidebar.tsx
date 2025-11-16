@@ -21,6 +21,7 @@ type SimpleNavItem = {
   label: string;
   href: string;
   icon: React.ReactNode;
+  adminOnly?: boolean;
 };
 
 type ProjectItem = {
@@ -38,6 +39,12 @@ const primaryNavItems: SimpleNavItem[] = [
     label: 'Reports & Analytics',
     href: '/dashboard/analytics',
     icon: <PieChart />,
+  },
+  {
+    label: 'Admin',
+    href: '/admin',
+    icon: <Settings />,
+    adminOnly: true,
   },
 ];
 
@@ -82,39 +89,41 @@ const AppSidebar: React.FC = () => {
         <div className="no-scrollbar mt-6 flex-1 overflow-y-auto pb-6">
           <SectionHeading isSidebarOpen={isSidebarOpen} title="Menu" />
           <ul className="space-y-1">
-            {primaryNavItems.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <li key={item.label}>
-                  <Link
-                    className={`group flex items-center gap-3 rounded-2xl px-1 py-2 font-medium text-sm transition ${
-                      isSidebarOpen ? 'justify-start' : 'justify-center'
-                    } ${
-                      active
-                        ? 'bg-slate-900 text-white dark:bg-white/10'
-                        : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/70'
-                    }`}
-                    href={item.href as unknown as UrlObject}
-                    prefetch={false}
-                  >
-                    <span
-                      className={`${
-                        isSidebarOpen ? 'ml-2' : ''
-                      } flex h-10 w-10 items-center justify-center rounded-2xl border text-base ${
+            {primaryNavItems
+              .filter((item) => !item.adminOnly || user?.isAdmin)
+              .map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <li key={item.label}>
+                    <Link
+                      className={`group flex items-center gap-3 rounded-2xl px-1 py-2 font-medium text-sm transition ${
+                        isSidebarOpen ? 'justify-start' : 'justify-center'
+                      } ${
                         active
-                          ? 'border-transparent bg-white/20 text-white dark:bg-white/10'
-                          : 'border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-300'
+                          ? 'bg-slate-900 text-white dark:bg-white/10'
+                          : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/70'
                       }`}
+                      href={item.href as unknown as UrlObject}
+                      prefetch={false}
                     >
-                      {item.icon}
-                    </span>
-                    {isSidebarOpen && (
-                      <span className="truncate">{item.label}</span>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
+                      <span
+                        className={`${
+                          isSidebarOpen ? 'ml-2' : ''
+                        } flex h-10 w-10 items-center justify-center rounded-2xl border text-base ${
+                          active
+                            ? 'border-transparent bg-white/20 text-white dark:bg-white/10'
+                            : 'border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-300'
+                        }`}
+                      >
+                        {item.icon}
+                      </span>
+                      {isSidebarOpen && (
+                        <span className="truncate">{item.label}</span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
           </ul>
 
           <div className="mt-8 space-y-3">

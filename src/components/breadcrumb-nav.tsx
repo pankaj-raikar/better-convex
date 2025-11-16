@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { api } from "@convex/_generated/api";
+import { api } from '@convex/_generated/api';
 import {
   Building2,
   CheckSquare,
@@ -10,12 +10,12 @@ import {
   LogOut,
   Tags,
   TestTube2,
-} from "lucide-react";
-import type { Route } from "next";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { toast } from "sonner";
-import { OrganizationSwitcher } from "@/components/organization/organization-switcher";
+} from 'lucide-react';
+import type { Route } from 'next';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { toast } from 'sonner';
+import { OrganizationSwitcher } from '@/components/organization/organization-switcher';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,14 +23,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/convex/auth-client";
+} from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { signOut } from '@/lib/convex/auth-client';
 import {
   useAuthAction,
   useCurrentUser,
   usePublicQuery,
-} from "@/lib/convex/hooks";
+} from '@/lib/convex/hooks';
 
 // Top-level regex for performance
 const SEGMENT_ID_PATTERN = /^[a-zA-Z0-9]+$/;
@@ -38,7 +38,7 @@ const SEGMENT_ID_PATTERN = /^[a-zA-Z0-9]+$/;
 export function BreadcrumbNav() {
   const pathname = usePathname();
   const user = useCurrentUser();
-  // @ts-ignore
+  // @ts-expect-error
   const generateSamplesAction = useAuthAction(api.seed.generateSamples);
 
   // Check if there's any data (projects)
@@ -46,19 +46,19 @@ export function BreadcrumbNav() {
     api.projects.list,
     { paginationOpts: { numItems: 1, cursor: null } },
     {
-      placeholderData: { page: [], isDone: true, continueCursor: "" },
+      placeholderData: { page: [], isDone: true, continueCursor: '' },
     }
   );
   const hasData = projectsData && projectsData.page.length > 0;
 
   // Parse the pathname into segments
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
 
   // Generate breadcrumb items
   const breadcrumbItems: React.ReactNode[] = [];
 
   // Always add home
-  if (pathname === "/") {
+  if (pathname === '/') {
     // On home page, show as current page
     breadcrumbItems.push(
       <BreadcrumbItem key="home">
@@ -90,25 +90,25 @@ export function BreadcrumbNav() {
   // Add each segment
   segments.forEach((segment, index) => {
     const isLast = index === segments.length - 1;
-    const href = `/${segments.slice(0, index + 1).join("/")}`;
+    const href = `/${segments.slice(0, index + 1).join('/')}`;
 
     // Format segment name
     let displayName = segment;
 
     // Handle special cases
-    if (segment === "projects") {
-      displayName = "Projects";
-    } else if (segment === "tags") {
-      displayName = "Tags";
-    } else if (segment === "login") {
-      displayName = "Login";
-    } else if (segment === "register") {
-      displayName = "Register";
+    if (segment === 'projects') {
+      displayName = 'Projects';
+    } else if (segment === 'tags') {
+      displayName = 'Tags';
+    } else if (segment === 'login') {
+      displayName = 'Login';
+    } else if (segment === 'register') {
+      displayName = 'Register';
     }
     // For dynamic segments (like project IDs), you might want to fetch the actual name
     // For now, we'll just show "Detail" for ID-like segments
     else if (segment.match(SEGMENT_ID_PATTERN)) {
-      displayName = "Detail";
+      displayName = 'Detail';
     }
 
     if (isLast) {
@@ -191,11 +191,11 @@ export function BreadcrumbNav() {
                       toast.promise(
                         generateSamplesAction.mutateAsync({ count: 100 }),
                         {
-                          loading: "Generating sample projects with todos...",
+                          loading: 'Generating sample projects with todos...',
                           success: (result) =>
                             `Created ${result.created} projects with ${result.todosCreated} todos!`,
                           error: (e) =>
-                            e.data?.message ?? "Failed to generate samples",
+                            e.data?.message ?? 'Failed to generate samples',
                         }
                       );
                     }}
