@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { aggregateUsers } from './aggregates';
 import { createInternalMutation } from './functions';
+import { ConvexError } from 'convex/values';
 
 /**
  * Backfill the user aggregate after configuration changes.
@@ -18,21 +19,30 @@ export const backfillUserAggregate = createInternalMutation()({
   handler: async (ctx) => {
     // Get all users first
     const users = await ctx.table('user');
-
-    // Clear both 'user' and 'admin' namespaces
-    await aggregateUsers.clear(ctx, { namespace: 'user' });
-    await aggregateUsers.clear(ctx, { namespace: 'admin' });
-
-    // Rebuild from all users - trigger will handle the aggregate updates
     let processed = 0;
-    for (const user of users) {
-      await aggregateUsers.insertIfDoesNotExist(ctx, user);
-      processed++;
-    }
 
-    return {
-      cleared: true,
-      processed,
-    };
+    try {
+      // Clear both 'user' and 'admin' namespaces
+      await aggregateUsers.clear(ctx, { namespace: 'user' });
+      await aggregateUsers.clear(ctx, { namespace: 'admin' });
+
+      // Rebuild from all users - trigger will handle the aggregate updates
+      for (const user of users) {
+        await aggregateUsers.insertIfDoesNotExist(ctx, user);
+        processed++;
+      }
+
+      return {
+        cleared: true,
+        processed,
+      };
+    } catch (error) {
+      console.error('Backfill failed:', error);
+      // Consider whether to re-throw or return error status
+      throw new ConvexError({
+        code: 'BACKFILL_ERROR',
+        message: `Backfill failed after processing ${processed ?? 0} users`,
+      });
+    }
   },
 });
