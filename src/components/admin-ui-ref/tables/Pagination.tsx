@@ -28,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({
         {currentPage > 3 && <span className="px-2">...</span>}
         {pagesAroundCurrent.map((page) => (
           <button
-            className={`px-4 py-2 ${
+            className={`rounded px-4 py-2 ${
               currentPage === page
                 ? 'bg-brand-500 text-white'
                 : 'text-gray-700 dark:text-gray-400'

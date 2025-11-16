@@ -44,6 +44,7 @@ export const env = createEnv({
    * can ensure the app isn't built with invalid env vars.
    */
   server: {
+    ARCJET_KEY: z.string().optional(),
     PORT: z.string().optional().default(DEFAULT.PORT),
   },
 

@@ -1,8 +1,7 @@
+import { ConvexError } from 'convex/values';
 import { z } from 'zod';
-
 import { aggregateUsers } from './aggregates';
 import { createInternalMutation } from './functions';
-import { ConvexError } from 'convex/values';
 
 /**
  * Backfill the user aggregate after configuration changes.
