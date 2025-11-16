@@ -3,6 +3,7 @@ import { ConvexError } from 'convex/values';
 import { zid } from 'convex-helpers/server/zod';
 import { z } from 'zod';
 
+import { aggregateUsers } from './aggregates';
 import { createAuth } from './auth';
 import {
   createAuthMutation,
@@ -245,13 +246,16 @@ export const getDashboardStats = createAuthQuery({
       });
     }
 
-    // Count all users and admins directly
-    // Note: For large datasets (1000s+), consider using aggregates
-    const allUsers = await ctx.table('user');
-    const totalUsers = allUsers.length;
+    // Count users and admins using aggregates (O(log n) vs O(n))
+    const totalUsers = await aggregateUsers.count(ctx, {
+      bounds: {},
+      namespace: 'user',
+    });
 
-    const admins = allUsers.filter((user) => user.role === 'admin');
-    const totalAdmins = admins.length;
+    const totalAdmins = await aggregateUsers.count(ctx, {
+      bounds: {},
+      namespace: 'admin',
+    });
 
     return {
       recentUsers,
