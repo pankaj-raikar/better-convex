@@ -93,7 +93,7 @@ export default function AdminDashboard() {
                 Recent Users
               </p>
               <p className="font-semibold text-2xl text-slate-900 dark:text-white">
-                {stats?.recentUsers.length ?? 0}
+                {stats?.recentUsers?.length ?? 0}
               </p>
             </div>
           </div>

@@ -173,7 +173,7 @@ function CreateUserDialog({ onClose, onSuccess }: CreateUserDialogProps) {
 
 type SetPasswordDialogProps = {
   onClose: () => void;
-  userId: string;
+  userId: Id<'user'>;
   userName: string;
 };
 
@@ -363,7 +363,7 @@ export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [passwordDialog, setPasswordDialog] = useState<{
-    userId: string;
+    userId: Id<'user'>;
     userName: string;
   } | null>(null);
   const [banDialog, setBanDialog] = useState<{
@@ -568,7 +568,7 @@ export default function UserManagementPage() {
                   >
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-500 font-semibold text-white">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 font-semibold text-white">
                           {user.name?.charAt(0) ?? user.email?.charAt(0) ?? 'U'}
                         </div>
                         <div>

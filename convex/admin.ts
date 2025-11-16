@@ -3,7 +3,6 @@ import { ConvexError } from 'convex/values';
 import { zid } from 'convex-helpers/server/zod';
 import { z } from 'zod';
 
-import { aggregateUsers } from './aggregates';
 import { createAuth } from './auth';
 import {
   createAuthMutation,
@@ -246,30 +245,17 @@ export const getDashboardStats = createAuthQuery({
       });
     }
 
-    // Count admins from last 100 users (representative sample)
-    const sampleUsers = await ctx.table('user').take(100);
-    let adminCount = 0;
+    // Count all users and admins directly
+    // Note: For large datasets (1000s+), consider using aggregates
+    const allUsers = await ctx.table('user');
+    const totalUsers = allUsers.length;
 
-    for (const user of sampleUsers) {
-      if (user.role === 'admin') {
-        adminCount++;
-      }
-    }
-
-    // Get exact user count using aggregate - O(log n) performance!
-    const totalUsers = await aggregateUsers.count(ctx, {
-      bounds: {} as any,
-      namespace: 'global',
-    });
-
-    // Estimate total admins based on sample
-    const estimatedAdmins = Math.round(
-      (adminCount / sampleUsers.length) * totalUsers
-    );
+    const admins = allUsers.filter((user) => user.role === 'admin');
+    const totalAdmins = admins.length;
 
     return {
       recentUsers,
-      totalAdmins: estimatedAdmins,
+      totalAdmins,
       totalUsers,
       userGrowth,
     };
@@ -293,9 +279,15 @@ export const createUser = createAuthMutation({
     userId: z.string().optional(),
   }),
   handler: async (ctx, args) => {
+    if (!ctx.user.session) {
+      throw new ConvexError({
+        code: 'UNAUTHORIZED',
+        message: 'No active session found',
+      });
+    }
+
     const auth = createAuth(ctx);
     const headers = await getHeaders(ctx, ctx.user.session);
-
     try {
       const result = await auth.api.createUser({
         body: {
@@ -312,10 +304,10 @@ export const createUser = createAuthMutation({
         userId: result.user.id,
       };
     } catch (error) {
+      console.error('Admin API error:', error);
       throw new ConvexError({
         code: 'ADMIN_API_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Failed to create user',
+        message: 'Failed to create user',
       });
     }
   },
@@ -327,10 +319,17 @@ export const setUserPassword = createAuthMutation({
 })({
   args: {
     newPassword: z.string().min(8),
-    userId: z.string(),
+    userId: zid('user'),
   },
   returns: z.boolean(),
   handler: async (ctx, args) => {
+    if (!ctx.user.session) {
+      throw new ConvexError({
+        code: 'UNAUTHORIZED',
+        message: 'No active session found',
+      });
+    }
+
     const auth = createAuth(ctx);
     const headers = await getHeaders(ctx, ctx.user.session);
 
@@ -448,13 +447,28 @@ export const listUserSessions = createAuthQuery({
         headers,
       });
 
-      return result.sessions.map((session: any) => ({
+      type BetterAuthSession = {
+        id: string;
+        userId: string;
+        expiresAt: Date;
+        createdAt: Date;
+        ipAddress?: string | null;
+        userAgent?: string | null;
+      };
+
+      return result.sessions.map((session: BetterAuthSession) => ({
         id: session.id,
         userId: session.userId,
-        expiresAt: session.expiresAt,
-        createdAt: session.createdAt,
-        ipAddress: session.ipAddress,
-        userAgent: session.userAgent,
+        expiresAt:
+          session.expiresAt instanceof Date
+            ? session.expiresAt.getTime()
+            : session.expiresAt,
+        createdAt:
+          session.createdAt instanceof Date
+            ? session.createdAt.getTime()
+            : session.createdAt,
+        ipAddress: session.ipAddress ?? undefined,
+        userAgent: session.userAgent ?? undefined,
       }));
     } catch (error) {
       throw new ConvexError({
