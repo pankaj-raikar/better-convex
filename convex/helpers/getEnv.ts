@@ -24,7 +24,7 @@ const envSchema = z.object({
   ADMIN: z
     .string()
     .optional()
-    .transform((s) => (s ? s.split(',').map(email => email.trim()) : []))
+    .transform((s) => (s ? s.split(',').map((email) => email.trim()) : []))
     .pipe(z.array(z.string())),
 });
 

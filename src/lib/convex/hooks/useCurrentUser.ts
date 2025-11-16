@@ -23,6 +23,7 @@ export const useCurrentUser = () => {
         isAdmin: false,
         name: '',
         personalOrganizationId: undefined,
+        email: '',
       },
     }
   );

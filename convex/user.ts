@@ -56,6 +56,7 @@ export const getCurrentUser = createPublicQuery()({
   returns: z.union([
     z.object({
       id: zid('user'),
+      email: z.string().optional(),
       activeOrganization: z
         .object({
           id: zid('organization'),
@@ -87,6 +88,7 @@ export const getCurrentUser = createPublicQuery()({
       isAdmin: user.isAdmin,
       name: user.name,
       plan: user.plan,
+      email: user.email,
       personalOrganizationId: user.personalOrganizationId,
     };
   },
