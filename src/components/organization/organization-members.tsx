@@ -175,12 +175,12 @@ export function OrganizationMembers({
     });
   };
 
-  const handleRemoveMember = (memberId: Id<'user'>) => {
-    removeMember.mutate({ memberId });
+  const handleRemoveMember = (member: Member) => {
+    removeMember.mutate({ memberId: member.id });
   };
 
-  const handleUpdateRole = (memberId: Id<'user'>, role: 'owner' | 'member') => {
-    updateMemberRole.mutate({ memberId, role });
+  const handleUpdateRole = (member: Member, role: 'owner' | 'member') => {
+    updateMemberRole.mutate({ memberId: member.id, role });
   };
 
   const handleCancelInvitation = (invitationId: Id<'invitation'>) => {
@@ -293,7 +293,7 @@ export function OrganizationMembers({
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() =>
-                                  handleUpdateRole(member.userId, 'owner')
+                                  handleUpdateRole(member, 'owner')
                                 }
                               >
                                 <Crown className="h-4 w-4" />
@@ -301,7 +301,7 @@ export function OrganizationMembers({
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() =>
-                                  handleUpdateRole(member.userId, 'member')
+                                  handleUpdateRole(member, 'member')
                                 }
                               >
                                 <User className="h-4 w-4" />
@@ -310,9 +310,7 @@ export function OrganizationMembers({
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="text-destructive"
-                                onClick={() =>
-                                  handleRemoveMember(member.userId)
-                                }
+                                onClick={() => handleRemoveMember(member)}
                               >
                                 <UserMinus className="h-4 w-4" />
                                 Remove Member

@@ -2,14 +2,14 @@ import { TableAggregate } from '@convex-dev/aggregate';
 import { components } from './_generated/api';
 import type { DataModel, Id } from './_generated/dataModel';
 
-// Aggregate for users
+// Aggregate for users by role (for counting total users and admins)
 export const aggregateUsers = new TableAggregate<{
   DataModel: DataModel;
   Key: null; // No sorting, just counting
-  Namespace: string; // userId
+  Namespace: string; // role: 'user' or 'admin'
   TableName: 'user';
 }>(components.aggregateUsers, {
-  namespace: (doc) => doc._id,
+  namespace: (doc) => doc.role ?? 'user',
   sortKey: () => null, // We only care about counting, not sorting
 });
 

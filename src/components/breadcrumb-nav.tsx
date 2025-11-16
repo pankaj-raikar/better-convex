@@ -38,6 +38,7 @@ const SEGMENT_ID_PATTERN = /^[a-zA-Z0-9]+$/;
 export function BreadcrumbNav() {
   const pathname = usePathname();
   const user = useCurrentUser();
+  // @ts-expect-error
   const generateSamplesAction = useAuthAction(api.seed.generateSamples);
 
   // Check if there's any data (projects)

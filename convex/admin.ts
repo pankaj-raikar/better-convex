@@ -1,8 +1,10 @@
+import { getHeaders } from 'better-auth-convex';
 import { ConvexError } from 'convex/values';
 import { zid } from 'convex-helpers/server/zod';
 import { z } from 'zod';
 
 import { aggregateUsers } from './aggregates';
+import { createAuth } from './auth';
 import {
   createAuthMutation,
   createAuthPaginatedQuery,
@@ -10,7 +12,7 @@ import {
 } from './functions';
 
 // Admin operations that work with our application's user role system
-// Better Auth's admin plugin handles banning, sessions, etc. through the client
+// Better Auth admin plugin integration for comprehensive admin features
 
 // Check if a user has admin privileges in our system
 export const checkUserAdminStatus = createAuthQuery({
@@ -244,32 +246,333 @@ export const getDashboardStats = createAuthQuery({
       });
     }
 
-    // Count admins from last 100 users (representative sample)
-    const sampleUsers = await ctx.table('user').take(100);
-    let adminCount = 0;
-
-    for (const user of sampleUsers) {
-      if (user.role === 'admin') {
-        adminCount++;
-      }
-    }
-
-    // Get exact user count using aggregate - O(log n) performance!
+    // Count users and admins using aggregates (O(log n) vs O(n))
     const totalUsers = await aggregateUsers.count(ctx, {
-      bounds: {} as any,
-      namespace: 'global',
+      bounds: {},
+      namespace: 'user',
     });
 
-    // Estimate total admins based on sample
-    const estimatedAdmins = Math.round(
-      (adminCount / sampleUsers.length) * totalUsers
-    );
+    const totalAdmins = await aggregateUsers.count(ctx, {
+      bounds: {},
+      namespace: 'admin',
+    });
 
     return {
       recentUsers,
-      totalAdmins: estimatedAdmins,
+      totalAdmins,
       totalUsers,
       userGrowth,
     };
+  },
+});
+
+// ===== Better Auth Admin API Integration =====
+
+// Create user via Better Auth admin API
+export const createUser = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    email: z.string().email(),
+    name: z.string(),
+    password: z.string().min(8),
+    role: z.enum(['user', 'admin']).optional(),
+  },
+  returns: z.object({
+    success: z.boolean(),
+    userId: z.string().optional(),
+  }),
+  handler: async (ctx, args) => {
+    if (!ctx.user.session) {
+      throw new ConvexError({
+        code: 'UNAUTHORIZED',
+        message: 'No active session found',
+      });
+    }
+
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+    try {
+      const result = await auth.api.createUser({
+        body: {
+          email: args.email,
+          name: args.name,
+          password: args.password,
+          role: args.role || 'user',
+        },
+        headers,
+      });
+
+      return {
+        success: true,
+        userId: result.user.id,
+      };
+    } catch (error) {
+      console.error('Admin API error:', error);
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message: 'Failed to create user',
+      });
+    }
+  },
+});
+
+// Set user password via Better Auth admin API
+export const setUserPassword = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    newPassword: z.string().min(8),
+    userId: zid('user'),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    if (!ctx.user.session) {
+      throw new ConvexError({
+        code: 'UNAUTHORIZED',
+        message: 'No active session found',
+      });
+    }
+
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.setUserPassword({
+        body: {
+          userId: args.userId,
+          newPassword: args.newPassword,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to set password',
+      });
+    }
+  },
+});
+
+// Ban user via Better Auth admin API
+export const banUser = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    banExpiresIn: z.number().optional(),
+    banReason: z.string().optional(),
+    userId: zid('user'),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.banUser({
+        body: {
+          userId: args.userId,
+          banReason: args.banReason,
+          banExpiresIn: args.banExpiresIn,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message: error instanceof Error ? error.message : 'Failed to ban user',
+      });
+    }
+  },
+});
+
+// Unban user via Better Auth admin API
+export const unbanUser = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    userId: zid('user'),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.unbanUser({
+        body: {
+          userId: args.userId,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to unban user',
+      });
+    }
+  },
+});
+
+// List user sessions via Better Auth admin API
+export const listUserSessions = createAuthQuery({
+  role: 'admin',
+})({
+  args: {
+    userId: zid('user'),
+  },
+  returns: z.array(
+    z.object({
+      id: z.string(),
+      userId: z.string(),
+      expiresAt: z.number(),
+      createdAt: z.number(),
+      ipAddress: z.string().optional(),
+      userAgent: z.string().optional(),
+    })
+  ),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      const result = await auth.api.listUserSessions({
+        body: {
+          userId: args.userId,
+        },
+        headers,
+      });
+
+      type BetterAuthSession = {
+        id: string;
+        userId: string;
+        expiresAt: Date;
+        createdAt: Date;
+        ipAddress?: string | null;
+        userAgent?: string | null;
+      };
+
+      return result.sessions.map((session: BetterAuthSession) => ({
+        id: session.id,
+        userId: session.userId,
+        expiresAt:
+          session.expiresAt instanceof Date
+            ? session.expiresAt.getTime()
+            : session.expiresAt,
+        createdAt:
+          session.createdAt instanceof Date
+            ? session.createdAt.getTime()
+            : session.createdAt,
+        ipAddress: session.ipAddress ?? undefined,
+        userAgent: session.userAgent ?? undefined,
+      }));
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to list sessions',
+      });
+    }
+  },
+});
+
+// Revoke specific user session via Better Auth admin API
+export const revokeUserSession = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    sessionToken: z.string(),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.revokeUserSession({
+        body: {
+          sessionToken: args.sessionToken,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to revoke session',
+      });
+    }
+  },
+});
+
+// Revoke all user sessions via Better Auth admin API
+export const revokeUserSessions = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    userId: zid('user'),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.revokeUserSessions({
+        body: {
+          userId: args.userId,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to revoke sessions',
+      });
+    }
+  },
+});
+
+// Remove user via Better Auth admin API
+export const removeUser = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    userId: zid('user'),
+  },
+  returns: z.boolean(),
+  handler: async (ctx, args) => {
+    const auth = createAuth(ctx);
+    const headers = await getHeaders(ctx, ctx.user.session);
+
+    try {
+      await auth.api.removeUser({
+        body: {
+          userId: args.userId,
+        },
+        headers,
+      });
+
+      return true;
+    } catch (error) {
+      throw new ConvexError({
+        code: 'ADMIN_API_ERROR',
+        message:
+          error instanceof Error ? error.message : 'Failed to remove user',
+      });
+    }
   },
 });
