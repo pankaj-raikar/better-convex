@@ -12,12 +12,17 @@ A modern Next.js starter template featuring **Convex** backend with **Better Aut
 - **🎯 Starter Features**: Todo management, projects, tags, and comments with soft delete
 - **🔍 Search & Pagination**: Full-text search indexes and efficient paginated queries
 - **🚀 Developer Experience**: Pre-configured hooks, RSC helpers, auth guards, and skeleton loading
+- **🔧 Admin Dashboard**: Complete admin interface with Better Auth admin API integration for user management
+- **⚙️ Background Jobs**: Inngest integration for reliable background processing and scheduled workflows
+- **📈 Aggregates**: Efficient user statistics with Convex Aggregate for O(log n) counting
 
 ## Tech Stack
 
 - **Framework**: Next.js 16 with App Router & React 19.2 (React Compiler enabled)
 - **Backend**: Convex with Ents (entity relationships)
 - **Authentication**: Better Auth with better-auth-convex package & organization plugin
+- **Admin**: Better Auth admin API for user management (ban, role assignment, impersonation)
+- **Background Jobs**: Inngest for reliable task processing and scheduled workflows
 - **Payments**: Polar integration (subscriptions & credits)
 - **Styling**: Tailwind CSS v4 with CSS-first configuration
 - **State**: Jotai-x for client state, React Query for server state
@@ -271,6 +276,61 @@ args: {
 }
 ```
 
+### Admin Dashboard & User Management
+
+The template includes a complete admin dashboard with Better Auth admin API integration:
+
+```typescript
+// convex/admin.ts - Admin operations
+export const updateUserRole = createAuthMutation({
+  role: 'admin',
+})({
+  args: {
+    userId: zid('user'),
+    role: z.enum(['user', 'admin']),
+  },
+  handler: async (ctx, args) => {
+    // Update user role with proper authorization
+  },
+});
+```
+
+Features:
+- User statistics with Convex Aggregate (O(log n) performance)
+- Role-based access control (admin/user)
+- User management operations (ban, unban, role assignment)
+- Real-time dashboard with pagination
+
+### Background Jobs with Inngest
+
+Inngest integration for reliable background processing:
+
+```typescript
+// src/inngest/functions/example.ts
+export const exampleFunction = inngest.createFunction(
+  { id: 'example-function' },
+  { event: 'app/example' },
+  async ({ event, step }) => {
+    // Step 1: Wait
+    await step.sleep('wait', '1s');
+
+    // Step 2: Do work (auto-retries on failure)
+    const result = await step.run('process-data', async () => ({
+      processed: true,
+      data: event.data,
+    }));
+
+    return result;
+  }
+);
+```
+
+Use cases:
+- Scheduled tasks and cron jobs
+- Email notifications and reminders
+- Data synchronization and backfills
+- Long-running operations with retry logic
+
 ## Development Commands
 
 ```bash
@@ -301,15 +361,26 @@ convex/
 ├── functions.ts      # Custom function wrappers
 ├── schema.ts         # Database schema
 ├── auth.ts          # Better Auth setup
+├── admin.ts         # Admin operations with Better Auth admin API
+├── adminInternal.ts # Internal admin utilities and backfills
+├── aggregates.ts    # Convex Aggregate definitions for efficient counting
 ├── todos.ts         # Example CRUD operations
 └── helpers/
     └── rateLimiter.ts
 
-src/lib/convex/
-├── hooks/           # React hooks
-├── server.ts        # RSC helpers
-├── auth-client.ts   # Client auth setup
-└── components/      # Auth components
+src/
+├── app/
+│   ├── dashboard/   # Admin dashboard UI with user management
+│   └── api/
+│       └── inngest/ # Inngest webhook endpoint
+├── inngest/
+│   ├── client.ts    # Inngest client configuration
+│   └── functions/   # Background job definitions
+└── lib/convex/
+    ├── hooks/           # React hooks
+    ├── server.ts        # RSC helpers
+    ├── auth-client.ts   # Client auth setup
+    └── components/      # Auth components
 ```
 
 ## Claude Agents & Cursor Rules
@@ -321,6 +392,7 @@ This template includes specialized AI agents and coding rules to enhance your de
 #### Core Convex Rules
 
 - **convex.mdc** ⭐ - **CRITICAL**: Complete Convex patterns guide (MUST READ for backend work)
+- **convex-admin.mdc** - Admin features with Better Auth admin API integration
 - **convex-client.mdc** - Client-side Convex integration patterns
 - **convex-ents.mdc** - Entity relationships and edge patterns
 - **convex-aggregate.mdc** - Efficient counting with O(log n) performance
