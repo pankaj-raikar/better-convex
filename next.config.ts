@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     browserDebugInfoInTerminal: true,
   },
   reactCompiler: true,
-  typedRoutes: true,
+  // typedRoutes: true, // Temporarily disabled to fix Link href type issues
 };
 
 export default nextConfig;

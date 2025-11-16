@@ -26,7 +26,7 @@ export default function UserDropdown() {
       await signOut();
       toast.success('Signed out successfully');
       closeDropdown();
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to sign out');
     }
   };

@@ -1,4 +1,5 @@
 'use client';
+import type { UrlObject } from 'node:url';
 import {
   Calendar,
   CheckSquare,
@@ -12,7 +13,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
-import type { UrlObject } from 'url';
 import { useSidebar } from '@/context/SidebarContext';
 // import { useUser } from '@clerk/nextjs';
 import { useCurrentUser } from '@/lib/convex/hooks';

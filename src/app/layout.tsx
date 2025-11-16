@@ -3,12 +3,12 @@ import { Geist, Geist_Mono, Outfit } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const geistSans = Geist({
+const _geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
+const _geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
